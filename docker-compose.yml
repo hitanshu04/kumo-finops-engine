@@ -1,0 +1,73 @@
+# Kumo FinOps Platform - Docker Compose
+# Usage: docker-compose up -d
+# API: http://localhost:8000  |  Docs: http://localhost:8000/docs
+
+version: '3.8'
+
+services:
+  # Python Backend - FastAPI
+  backend:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    # --- THIS IS THE SECURITY FIX ---
+    env_file:
+      - .env
+    # -------------------------------
+    environment:
+      - DATABASE_URL=postgresql://kumo_user:kumo_pass@db:5432/kumo_db
+      - REDIS_URL=redis://redis:6379/0
+
+  # Background Worker - Celery
+  worker:
+    build: .
+    command: celery -A app.worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    # We add this here too, just in case the worker needs to send alerts later
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://kumo_user:kumo_pass@db:5432/kumo_db
+      - REDIS_URL=redis://redis:6379/0
+
+  # Database service - PostgreSQL
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=kumo_user
+      - POSTGRES_PASSWORD=kumo_pass
+      - POSTGRES_DB=kumo_db
+
+  # Redis service - Caching and Message Broker
+  redis:
+    image: redis:7
+
+  # Frontend Dashboard (Streamlit)
+  frontend:
+    build: .
+    # Runs the dashboard on port 8501
+    command: streamlit run frontend/app.py --server.port 8501 --server.address 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "8501:8501"
+    environment:
+      # This tells the frontend where the backend lives inside Docker
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

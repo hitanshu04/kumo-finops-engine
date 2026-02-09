@@ -1,0 +1,17 @@
+# Kumo FinOps Platform - Backend Dependencies
+# Python 3.10+
+
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+redis
+celery
+asyncpg
+pydantic
+pydantic-settings
+requests
+streamlit
+requests
+pandas
+plotly
