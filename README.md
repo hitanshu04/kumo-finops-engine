@@ -126,4 +126,11 @@ SLACK_WEBHOOK_URL=[https://hooks.slack.com/services/YOUR/WEBHOOK/URL](https://ho
 
 ---
 
+---
+
+## 🔗 Project Links
+
+Looking for the Frontend Dashboard?  
+👉 **[View Frontend Repository (Next.js UI)](https://github.com/hitanshu04/kumo-frontend)**
+
 _Backend Architected with ❤️ by Hitanshu Kumar Singh_
