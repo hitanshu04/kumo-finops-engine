@@ -1,55 +1,104 @@
-# Kumo – FinOps Platform
+# 🧠 Kumo FinOps Engine - Backend API
 
-High-performance FinOps platform backend (FastAPI, PostgreSQL, Celery, Redis).
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.95%2B-009688?logo=fastapi)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker)
 
-## Quick start with Docker
+The intelligence core of the **Kumo Platform**. This high-performance API handles data ingestion, performs statistical anomaly detection using Z-Score algorithms, and dispatches real-time alerts to Slack.
 
-```bash
-docker-compose up -d
+---
+
+## 🏗️ System Architecture
+
+This backend serves as the logic layer between the User Interface and the Database.
+
+```mermaid
+graph LR
+    A[Next.js Frontend] -->|POST /ingest| B(FastAPI Engine)
+    B -->|Store Data| C[(PostgreSQL)]
+    B -->|Calculate Z-Score| D{Anomaly?}
+    D -- Yes --> E[Slack Webhook]
+    D -- No --> F[Return Normal Status]
 ```
 
-- **API:** http://localhost:8000  
-- **Docs:** http://localhost:8000/docs  
-- **Health:** http://localhost:8000/health  
+🧮 The Logic: Z-Score Algorithm
+To detect spending spikes, Kumo uses a statistical approach rather than fixed thresholds. This allows it to adapt to different spending baselines.
 
-Services: `web` (FastAPI), `worker` (Celery), `db` (PostgreSQL 15), `redis`.
+Formula :
+(image.png)
 
-## Local development
+$X$: Current transaction amount.
+$\mu$ (Mu): Moving average of historical costs.
+$\sigma$ (Sigma): Standard deviation (volatility) of costs.
 
-1. Copy env and start DB/Redis:
+Decision Rule: If the Z-Score is greater than 3 (i.e., the cost is 3 standard deviations away from the mean), it is flagged as an Anomaly.
 
-   ```bash
-   copy .env.example .env
-   docker-compose up -d db redis
-   ```
+🚀 Quick Start (Local)
+Option 1: Using Docker (Recommended)
+You can spin up the API and Database instantly using Docker Compose.
 
-2. Create a virtualenv and run the app:
+# 1. Clone the repo
 
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
-   pip install -r requirements.txt
-   uvicorn app.main:app --reload
-   ```
+git clone https://github.com/hitanshu04/kumo-finops-engine.git
 
-## Project structure
+# 2. Start Services
 
-```
-app/
-├── main.py           # FastAPI app, health, lifespan
-├── core/
-│   └── config.py     # Pydantic-settings (DB_URL, REDIS_URL, etc.)
-├── db/
-│   ├── base.py       # SQLAlchemy Base
-│   └── session.py    # Async engine & session
-├── api/v1/           # API routes (versioned)
-└── workers/          # Celery app & tasks
-```
+docker-compose up -d --build
 
-## Environment variables
+The API will be live at: http://localhost:8000
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DB_URL` | PostgreSQL URL (use `postgresql+asyncpg://`) | `postgresql+asyncpg://kumo:kumo@localhost:5432/kumo` |
-| `REDIS_URL` | Redis URL | `redis://localhost:6379/0` |
-| `ENVIRONMENT` | `development` \| `staging` \| `production` | `development` |
+Option 2: Manual Setup
+If you don't have Docker, run it with Python directly.
+
+# 1. Create Virtual Env
+
+python -m venv venv
+source venv/bin/activate # or venv\Scripts\activate on Windows
+
+# 2. Install Dependencies
+
+pip install -r requirements.txt
+
+# 3. Setup Database (Ensure Postgres is running locally)
+
+# Update .env file with your DB credentials
+
+# 4. Run Server
+
+uvicorn app.main:app --reload
+
+📡 API Endpoints
+Once running, visit the Interactive Swagger Documentation at:
+
+👉 http://localhost:8000/docs
+
+(image-1.png)
+
+📂 Project Structure
+
+kumo-engine/
+├── app/
+│ ├── main.py # Entry point, CORS settings, API routes
+│ ├── models.py # SQLAlchemy Database Models
+│ ├── schemas.py # Pydantic Data Validation
+│ ├── crud.py # Database Logic (Create/Read)
+│ └── database.py # DB Connection Setup
+├── Dockerfile # Container instructions
+├── docker-compose.yml # Orchestration for API + DB
+├── requirements.txt # Python dependencies
+└── .env.example # Environment variables template
+
+🔐 Environment Variables
+
+Create a .env file in the root directory:
+
+# Database Connection String
+
+DB_URL=postgresql://user:password@localhost:5432/kumo
+
+# Optional: Slack Webhook (If configured in backend directly)
+
+SLACK_WEBHOOK_URL=[https://hooks.slack.com/services/YOUR/WEBHOOK/URL](https://hooks.slack.com/services/YOUR/WEBHOOK/URL)
+
+Backend Architected with ❤️ by Hitanshu Kumar Singh
