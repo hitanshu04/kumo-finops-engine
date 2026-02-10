@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # 1. GET THE URL FROM DOCKER ENV (Defaults to localhost if not found)
-API_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+API_URL = "https://kumo-finops-engine.onrender.com"
 
 st.set_page_config(page_title="Kumo FinOps", page_icon="☁️", layout="wide")
 st.title("☁️ Kumo: Cloud Cost Intelligence")
