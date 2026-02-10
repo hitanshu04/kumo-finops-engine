@@ -22,83 +22,108 @@ graph LR
     D -- No --> F[Return Normal Status]
 ```
 
-🧮 The Logic: Z-Score Algorithm
+_(Note: The diagram above renders automatically on GitHub)_
+
+---
+
+## 🧮 The Logic: Z-Score Algorithm
+
 To detect spending spikes, Kumo uses a statistical approach rather than fixed thresholds. This allows it to adapt to different spending baselines.
 
-Formula :
-(image.png)
+**Formula:**
+$$Z = \frac{(X - \mu)}{\sigma}$$
 
-$X$: Current transaction amount.
-$\mu$ (Mu): Moving average of historical costs.
-$\sigma$ (Sigma): Standard deviation (volatility) of costs.
+- **$X$**: Current transaction amount.
+- **$\mu$ (Mu)**: Moving average of historical costs.
+- **$\sigma$ (Sigma)**: Standard deviation (volatility) of costs.
 
-Decision Rule: If the Z-Score is greater than 3 (i.e., the cost is 3 standard deviations away from the mean), it is flagged as an Anomaly.
+> **Decision Rule:** If the Z-Score is greater than **3** (i.e., the cost is 3 standard deviations away from the mean), it is flagged as an **Anomaly**.
 
-🚀 Quick Start (Local)
-Option 1: Using Docker (Recommended)
+---
+
+## 🚀 Quick Start (Local)
+
+### Option 1: Using Docker (Recommended)
+
 You can spin up the API and Database instantly using Docker Compose.
 
+```bash
 # 1. Clone the repo
-
-git clone https://github.com/hitanshu04/kumo-finops-engine.git
+git clone [https://github.com/hitanshu04/kumo-finops-engine.git](https://github.com/hitanshu04/kumo-finops-engine.git)
 
 # 2. Start Services
-
 docker-compose up -d --build
+```
 
-The API will be live at: http://localhost:8000
+The API will be live at: **http://localhost:8000**
 
-Option 2: Manual Setup
+### Option 2: Manual Setup
+
 If you don't have Docker, run it with Python directly.
 
+```bash
 # 1. Create Virtual Env
-
 python -m venv venv
-source venv/bin/activate # or venv\Scripts\activate on Windows
+
+# Activate Virtual Env (Windows)
+venv\Scripts\activate
+# OR for Mac/Linux: source venv/bin/activate
 
 # 2. Install Dependencies
-
 pip install -r requirements.txt
 
-# 3. Setup Database (Ensure Postgres is running locally)
-
-# Update .env file with your DB credentials
+# 3. Setup Database
+# Ensure your Postgres is running and update .env file
 
 # 4. Run Server
-
 uvicorn app.main:app --reload
+```
 
-📡 API Endpoints
-Once running, visit the Interactive Swagger Documentation at:
+---
 
-👉 http://localhost:8000/docs
+## 📡 API Endpoints
 
-(image-1.png)
+Once running, visit the **Interactive Swagger Documentation** at:  
+👉 **[http://localhost:8000/docs](http://localhost:8000/docs)**
 
-📂 Project Structure
+| Method | Endpoint   | Description                                                            |
+| :----- | :--------- | :--------------------------------------------------------------------- |
+| `GET`  | `/`        | Health Check (Returns "Ready for Money")                               |
+| `POST` | `/ingest/` | **Main Engine:** Accepts cost data, saves to DB, checks for anomalies. |
+| `GET`  | `/costs/`  | Retrieves history of cost entries for charts.                          |
 
+---
+
+## 📂 Project Structure
+
+```bash
 kumo-engine/
 ├── app/
-│ ├── main.py # Entry point, CORS settings, API routes
-│ ├── models.py # SQLAlchemy Database Models
-│ ├── schemas.py # Pydantic Data Validation
-│ ├── crud.py # Database Logic (Create/Read)
-│ └── database.py # DB Connection Setup
-├── Dockerfile # Container instructions
-├── docker-compose.yml # Orchestration for API + DB
-├── requirements.txt # Python dependencies
-└── .env.example # Environment variables template
+│   ├── main.py           # Entry point, CORS settings, API routes
+│   ├── models.py         # SQLAlchemy Database Models
+│   ├── schemas.py        # Pydantic Data Validation
+│   ├── crud.py           # Database Logic (Create/Read)
+│   └── database.py       # DB Connection Setup
+├── Dockerfile            # Container instructions
+├── docker-compose.yml    # Orchestration for API + DB
+├── requirements.txt      # Python dependencies
+└── .env.example          # Environment variables template
+```
 
-🔐 Environment Variables
+---
 
-Create a .env file in the root directory:
+## 🔐 Environment Variables
 
+Create a `.env` file in the root directory:
+
+```env
 # Database Connection String
-
 DB_URL=postgresql://user:password@localhost:5432/kumo
 
 # Optional: Slack Webhook (If configured in backend directly)
-
 SLACK_WEBHOOK_URL=[https://hooks.slack.com/services/YOUR/WEBHOOK/URL](https://hooks.slack.com/services/YOUR/WEBHOOK/URL)
+```
 
-Backend Architected with ❤️ by Hitanshu Kumar Singh
+---
+
+_Backend Architected with ❤️ by Hitanshu Kumar Singh_
