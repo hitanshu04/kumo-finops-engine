@@ -25,6 +25,12 @@ graph LR
 _(Note: The diagram above renders automatically on GitHub)_
 
 ---
+### 🚀 Demo: 
+
+https://github.com/user-attachments/assets/a84c2c59-8416-4fdb-85e9-8188bb657cf8
+
+
+
 
 ## 🧮 The Logic: Z-Score Algorithm
 
